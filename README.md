@@ -5,6 +5,12 @@ Available at :
 
 https://kitchensink-93677313045.us-central1.run.app/members-ui
 
+## Test Files
+
+The project includes unit tests to ensure the functionality of the application. Below is a list of key test files:
+
+- `spring/kitchensink/src/test/java/com/example/kitchensink/service/MemberServiceTest.java`: Contains unit tests for the `MemberService` class, testing member registration, email uniqueness, and retrieval operations.
+
 
 Spring Boot Kitchensink App - Deploy with Docker & Terraform on GCP
 
