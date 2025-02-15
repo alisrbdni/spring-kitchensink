@@ -1,5 +1,10 @@
 # spring-kitchensink
 
+App Deployed with Docker on GCP cloud run 
+Available at :
+
+https://kitchensink-93677313045.us-central1.run.app/members-ui
+
 
 Spring Boot Kitchensink App - Deploy with Docker & Terraform on GCP
 

@@ -1,1 +1,7 @@
+# Ignore all Jupyter Notebook checkpoint directories recursively
+**/.ipynb_checkpoints/
 **/.DS_Store
+# Ignore Terraform generated files and directories
+spring/kitchensink/terraform/.terraform.lock.hcl
+spring/kitchensink/terraform/.terraform/
+spring/kitchensink/terraform/terraform.tfstate.backup
