@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.Collection;
+import java.util.Collection;
 
 @ExtendWith(SpringExtension.class)
 @DataMongoTest
