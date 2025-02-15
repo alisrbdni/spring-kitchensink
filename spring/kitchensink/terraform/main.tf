@@ -67,7 +67,7 @@ resource "google_cloud_run_service" "cloud_run" {
   template {
     spec {
       containers {
-        image = "us-central1-docker.pkg.dev/var.gcpprojectid/{var.gcp_project_id}/{var.artifact_repo_name}/kitchensink:latest"
+        image = "us-central1-docker.pkg.dev/${var.gcp_project_id}/${var.artifact_repo_name}/kitchensink:latest"
         ports {
           container_port = 8080
         }
