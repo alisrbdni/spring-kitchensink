@@ -1,11 +1,10 @@
 # Use Eclipse Temurin’s Java 21 JDK on Alpine Linux
 FROM eclipse-temurin:21-jdk-alpine
 
-# Create a directory for the app
+# Set working directory
 WORKDIR /app
 
-# Copy the built JAR file into the container
-# Update the JAR name if yours differs
+# Copy built JAR file into the container
 COPY target/spring-kitchensink-1.0.0-SNAPSHOT.jar /app/app.jar
 
 # Expose the default Spring Boot port

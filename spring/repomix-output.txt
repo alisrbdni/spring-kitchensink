@@ -49,6 +49,8 @@ kitchensink/
   .mvn/
     wrapper/
       maven-wrapper.properties
+  exception/
+    GlobalExceptionHandler.java
   src/
     main/
       java/
@@ -58,6 +60,7 @@ kitchensink/
               controller/
                 MemberController.java
                 MemberPageController.java
+                NewUiController.java
               exception/
                 GlobalExceptionHandler.java
               model/
@@ -70,17 +73,15 @@ kitchensink/
       resources/
         templates/
           members-list.html
-    test/
-      java/
-        com/
-          example/
-            kitchensink_springboot/
-              MemberIntegrationTest.java
+          new-ui.html
   .gitattributes
   .gitignore
+  Dockerfile
+  MemberIntegrationTest.java
   mvnw
   mvnw.cmd
   pom.xml
+  Readme.md
 
 ================================================================
 Files
@@ -108,6 +109,46 @@ File: kitchensink/.mvn/wrapper/maven-wrapper.properties
 wrapperVersion=3.3.2
 distributionType=only-script
 distributionUrl=https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/3.9.9/apache-maven-3.9.9-bin.zip
+
+================
+File: kitchensink/exception/GlobalExceptionHandler.java
+================
+package com.example.kitchensink.exception;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.context.request.WebRequest;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@ControllerAdvice
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException ex,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request) {
+
+        Map<String, String> errors = new HashMap<>();
+        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+            errors.put(error.getField(), error.getDefaultMessage());
+        }
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> handleRuntimeException(RuntimeException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+}
 
 ================
 File: kitchensink/src/main/java/com/example/kitchensink/controller/MemberController.java
@@ -160,27 +201,6 @@ public class MemberController {
 ================
 File: kitchensink/src/main/java/com/example/kitchensink/controller/MemberPageController.java
 ================
-// package com.example.kitchensink.controller;
-
-// import com.example.kitchensink.model.Member;
-// import com.example.kitchensink.repository.MemberRepository;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.stereotype.Controller;
-// import org.springframework.ui.Model;
-// import org.springframework.web.bind.annotation.GetMapping;
-
-// @Controller
-// public class MemberPageController {
-
-//     @Autowired
-//     MemberRepository memberRepository;
-
-//     @GetMapping("/members-ui")
-//     public String listMembers(Model model) {
-//         model.addAttribute("members", memberRepository.findAll());
-//         return "members-list"; // points to a Thymeleaf template "members-list.html"
-//     }
-// }
 package com.example.kitchensink.controller;
 
 import com.example.kitchensink.model.Member;
@@ -196,19 +216,56 @@ public class MemberPageController {
     @Autowired
     private MemberRepository memberRepository;
 
-    // Show all members
     @GetMapping("/members-ui")
     public String listMembers(Model model) {
         model.addAttribute("members", memberRepository.findAll());
-        model.addAttribute("newMember", new Member()); // For the add user form
-        return "members-list";
+        model.addAttribute("newMember", new Member()); 
+        return "members-list"; 
     }
 
-    // Handle form submission for adding a member
     @PostMapping("/add-member")
     public String addMember(@ModelAttribute Member member) {
         memberRepository.save(member);
-        return "redirect:/members-ui"; // Redirect to the updated member list
+        return "redirect:/members-ui";
+    }
+}
+
+================
+File: kitchensink/src/main/java/com/example/kitchensink/controller/NewUiController.java
+================
+package com.example.kitchensink.controller;
+
+import com.example.kitchensink.model.Member;
+import com.example.kitchensink.repository.MemberRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+@Controller
+public class NewUiController {
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    /**
+     * Displays the "modern" new UI at GET /new-ui.
+     */
+    @GetMapping("/new-ui")
+    public String showNewUi(Model model) {
+        model.addAttribute("members", memberRepository.findAll());
+        return "new-ui"; // references new-ui.html
+    }
+
+    /**
+     * Handles form submission for the new UI. 
+     * POST /new-ui/add-member -> persist -> redirect back to /new-ui
+     */
+    @PostMapping("/new-ui/add-member")
+    public String newUiAddMember(@ModelAttribute Member member) {
+        memberRepository.save(member);
+        // Return user back to the new UI page with updated list
+        return "redirect:/new-ui";
     }
 }
 
@@ -402,10 +459,10 @@ package com.example.kitchensink;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-// Add import                                                                                                                                                                                                                               
-import org.springframework.transaction.annotation.EnableTransactionManagement;    
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
 @SpringBootApplication
-@EnableTransactionManagement 
+@EnableTransactionManagement
 public class SpringKitchensinkApplication {
 
     public static void main(String[] args) {
@@ -416,120 +473,560 @@ public class SpringKitchensinkApplication {
 ================
 File: kitchensink/src/main/resources/templates/members-list.html
 ================
-<!-- <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-  <title>Members</title>
-</head>
-<body>
-  <h1>All Members</h1>
-  <table>
-    <tr><th>Name</th><th>Email</th><th>Phone</th><th>Phone 2</th></tr>
-    <tr th:each="m : ${members}">
-      <td th:text="${m.name}"></td>
-      <td th:text="${m.email}"></td>
-      <td th:text="${m.phoneNumber}"></td>
-      <td th:text="${m.phoneNumber2}"></td>
-
-    </tr>
-  </table>
-</body>
-</html> -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Members</title>
+    <title>kitchensink (Spring + MongoDB)</title>
+    <meta charset="UTF-8" />
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        form {
-            margin-bottom: 20px;
-        }
-        input, button {
-            padding: 10px;
-            margin: 5px;
-        }
+      /* 
+         1) Minimal "navbar" styling
+         2) The old "kitchensink" style from JBoss (screen.css), 
+            but we remove the .dualbrand float to prevent overlap.
+      */
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #F1F1F1;
+        font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+        font-size: 0.8em;
+        color: #363636;
+      }
+      /* A top nav bar to hold logos + "Better UI" link */
+      .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #f5f5f5;
+        padding: 10px 20px;
+        box-shadow: 0 0 5px rgba(0,0,0,0.2);
+      }
+      .navbar-left {
+        display: flex;
+        gap: 10px;
+      }
+      .navbar-left img {
+        max-height: 50px;
+      }
+      .navbar-right button {
+        padding: 8px 16px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-size: 0.9em;
+        border-radius: 4px;
+      }
+      .navbar-right button:hover {
+        background-color: #45a049;
+      }
+
+      /* The old container styling from JBoss kitchensink */
+      #container {
+        margin: 0 auto;
+        padding: 0 20px 10px 20px;
+        border-top: 5px solid #000000;
+        border-left: 5px solid #8c8f91;
+        border-right: 5px solid #8c8f91;
+        border-bottom: 25px solid #8c8f91;
+        width: 865px;
+        background: #FFFFFF;
+        padding-top: 30px;
+        box-shadow: 3px 3px 15px #d5d5d5;
+      }
+      #content {
+        float: left;
+        width: 500px;
+        margin: 20px;
+      }
+      #aside {
+        font-size: 0.9em;
+        width: 275px;
+        float: left;
+        margin: 20px 0px;
+        border: 1px solid #D5D5D5;
+        background: #F1F1F1;
+        padding: 20px;
+      }
+      #aside ul {
+        padding-left: 30px;
+      }
+      #footer {
+        clear: both;
+        text-align: center;
+        color: #666666;
+        font-size: 0.85em;
+        padding-top: 20px;
+      }
+      h1 {
+        color: #243446;
+        font-size: 2.25em;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1em 0;
+      }
+      table, th, td {
+        border: 1px solid #CCC;
+      }
+      th, td {
+        padding: 0.6em;
+      }
+      form {
+        border: 1px solid #D5D5D5;
+        padding: 1em;
+        margin: 1em 0;
+      }
+      .register {
+        margin-left: 85px;
+      }
     </style>
 </head>
 <body>
 
-    <h1>Member List</h1>
+    <!-- A top navbar that won't overlap the container -->
+    <div class="navbar">
+      <div class="navbar-left">
+        <!-- Spring logo from external link, clickable -->
+      <!-- Example HTML snippet -->
+<div style="margin-bottom: 20px;">
+    <!-- Spring logo, linking to https://spring.io -->
+    <a href="https://spring.io" target="_blank" rel="noopener">
+      <img src="https://docs.spring.io/spring-boot/_/img/spring-logo.svg"
+           alt="Spring Logo" width="120"/>
+    </a>
+    &nbsp;&nbsp;
+    <!-- MongoDB logo, linking to https://mongodb.com -->
+    <a href="https://www.mongodb.com" target="_blank" rel="noopener">
+      <img src="https://webimages.mongodb.com/_com_assets/cms/kuyjf3vea2hg34taa-horizontal_default_slate_blue.svg?auto=format%252Ccompress"
+           alt="MongoDB Logo" width="120"
+            />
+    </a>
+  </div>
+  
+        <!-- GitHub logo from external link, clickable -->
+        <a href="https://github.com/your-org/spring-kitchensink" target="_blank" rel="noopener">
+          <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png"
+               alt="GitHub Logo" 
+               style="max-height:40px;" />
+        </a>
+      </div>
 
-    <!-- Table for displaying existing members -->
-    <table>
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-        </tr>
-        <tr th:each="m : ${members}">
-            <td th:text="${m.name}"></td>
-            <td th:text="${m.email}"></td>
-            <td th:text="${m.phoneNumber}"></td>
-        </tr>
-    </table>
+      <div class="navbar-right">
+        <!-- A button that sends user to a new UI or "Better UX" page -->
+        <a th:href="@{/new-ui}">
+          <button type="button">Try Our New UI</button>
+        </a>
+      </div>
+    </div>
 
-    <h2>Add New Member</h2>
-    
-    <!-- Form for adding a new member -->
-    <form action="/add-member" method="post">
-        <label>Name:</label>
-        <input type="text" name="name" required /><br>
-        
-        <label>Email:</label>
-        <input type="email" name="email" required /><br>
-        
-        <label>Phone Number:</label>
-        <input type="text" name="phoneNumber" required /><br>
+    <div id="container">
+      <div id="content">
+          <h1>Welcome to Spring Kitchensink!</h1>
+<div style="margin-top: 20%;"></div>
+          <h2>Members</h2>
+          <table>
+              <thead>
+                  <tr>
+                      <th>Id</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Phone #</th>
+                      <th>REST URL</th>
+                  </tr>
+              </thead>
+              <tbody th:each="m : ${members}">
+                  <tr>
+                      <td th:text="${m.id}">Id</td>
+                      <td th:text="${m.name}">Name</td>
+                      <td th:text="${m.email}">Email</td>
+                      <td th:text="${m.phoneNumber}">Phone</td>
+                      <td>
+                        <a th:href="@{/api/members/{id}(id=${m.id})}"
+                           th:text="'/api/members/' + ${m.id}">
+                          /api/members/X
+                        </a>
+                      </td>
+                  </tr>
+              </tbody>
+              <tfoot>
+                  <tr>
+                      <td colspan="5">
+                          REST URL for all members:
+                          <a th:href="@{/api/members}">/api/members</a>
+                      </td>
+                  </tr>
+              </tfoot>
+          </table>
 
-        <button type="submit">Add Member</button>
-    </form>
+          <h3>Register a new Member</h3>
+          <form action="/add-member" method="POST">
+              <p>
+                  <label>Name: </label>
+                  <input type="text" name="name" required />
+              </p>
+              <p>
+                  <label>Email: </label>
+                  <input type="email" name="email" required />
+              </p>
+              <p>
+                  <label>Phone: </label>
+                  <input type="text" name="phoneNumber" required />
+              </p>
+              <p class="register">
+                  <button type="submit">Register</button>
+              </p>
+          </form>
+      </div>
 
+      <div id="aside">
+          <p>Learn more about the Spring ecosystem and MongoDB:</p>
+          <ul>
+              <li>
+                <a href="https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/"
+                   target="_blank" rel="noopener">
+                  Spring Boot Documentation
+                </a>
+              </li>
+              <li>
+                <a href="https://www.mongodb.com/docs/" target="_blank" rel="noopener">
+                  MongoDB Documentation
+                </a>
+              </li>
+              <li>
+                <a href="https://github.com/your-org/spring-kitchensink" 
+                   target="_blank" rel="noopener">
+                  Project GitHub
+                </a>
+              </li>
+          </ul>
+      </div>
+
+      <div id="footer">
+          <p>
+              This project is a Spring Boot + MongoDB version of the "kitchensink" demo.
+          </p>
+      </div>
+    </div>
 </body>
 </html>
 
 ================
-File: kitchensink/src/test/java/com/example/kitchensink_springboot/MemberIntegrationTest.java
+File: kitchensink/src/main/resources/templates/new-ui.html
 ================
-// package com.example.kitchensink;
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>New UI - Kitchensink</title>
+    <meta charset="UTF-8" />
+    <style>
+      /* Minimal "modern" layout + top navbar */
+      body {
+        margin: 0; 
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f5f7fa;
+      }
 
-// import com.example.kitchensink.model.Member;
-// import com.example.kitchensink.repository.MemberRepository;
-// import org.junit.jupiter.api.Assertions;
-// import org.junit.jupiter.api.Test;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.boot.test.context.SpringBootTest;
+      .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #fafafa;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+        padding: 10px 20px;
+      }
+      .navbar-left {
+        display: flex;
+        gap: 10px;
+      }
+      .navbar-left img {
+        max-height: 40px;
+      }
+      .navbar-right button {
+        background-color: #ff9800;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        cursor: pointer;
+      }
+      .navbar-right button:hover {
+        background-color: #e68a00;
+      }
 
-// @SpringBootTest
-// public class MemberIntegrationTest {
+      header {
+        background: linear-gradient(to right, #68b4cf, #88d8b0);
+        padding: 20px;
+        text-align: center;
+        color: #fff;
+      }
+      header h1 {
+        margin: 0;
+        font-size: 2em;
+      }
+      header p {
+        margin: 4px 0;
+      }
 
-//     @Autowired
-//     MemberRepository memberRepository;
+      main {
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 0 10px;
+      }
 
-//     @Test
-//     public void testRegisterMember() {
-//         Member m = new Member("John Doe", "john@mail.com", "1234567890");
-//         Member saved = memberRepository.save(m);
+      .members-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+      .member-card {
+        flex: 1 1 calc(33% - 16px);
+        background: #fff;
+        border-radius: 5px;
+        padding: 12px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        min-width: 220px;
+      }
+      .member-card h3 {
+        margin: 0 0 8px;
+        font-size: 1.1em;
+        color: #333;
+      }
+      .member-card p {
+        margin: 4px 0;
+        font-size: 0.9em;
+        color: #666;
+      }
+      .rest-link {
+        margin-top: 8px;
+        display: inline-block;
+        color: #0066cc;
+        font-size: 0.85em;
+        text-decoration: none;
+      }
 
-//         Assertions.assertNotNull(saved.getId(), "Saved member ID should not be null");
-//         Assertions.assertEquals("john@mail.com", saved.getEmail());
-//     }
-// }
+      .add-form {
+        background: #fff;
+        border-radius: 5px;
+        padding: 16px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-top: 20px;
+      }
+      .add-form h2 {
+        margin-top: 0;
+      }
+      .add-form label {
+        display: block;
+        margin: 6px 0 2px;
+        font-weight: bold;
+        font-size: 0.9em;
+      }
+      .add-form input {
+        width: 100%;
+        padding: 6px;
+        margin-bottom: 12px;
+        font-size: 0.9em;
+        box-sizing: border-box;
+      }
+      .add-form button {
+        background-color: #68b4cf;
+        border: none;
+        padding: 10px 16px;
+        color: #fff;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      .add-form button:hover {
+        background-color: #579eb8;
+      }
+
+      footer {
+        text-align: center;
+        margin: 20px 0;
+        font-size: 0.85em;
+        color: #999;
+      }
+      footer a {
+        color: #666;
+        text-decoration: none;
+      }
+      footer a:hover {
+        text-decoration: underline;
+      }
+
+      .docs-section {
+        background: #fafafa;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-top: 30px;
+        padding: 16px;
+      }
+      .docs-section details {
+        margin-bottom: 8px;
+      }
+      .docs-section summary {
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1em;
+        margin-bottom: 8px;
+      }
+      .docs-section p, .docs-section pre {
+        font-size: 0.9em;
+        line-height: 1.4;
+        margin: 6px 0;
+      }
+      .docs-section code {
+        background-color: #eee;
+        padding: 2px 4px;
+        border-radius: 3px;
+      }
+    </style>
+</head>
+<body>
+
+  <!-- Navbar with logos (Spring, MongoDB, GitHub) on left, "Go Back" button on right -->
+  <div class="navbar">
+    <div class="navbar-left">
+      <a href="https://spring.io" target="_blank" rel="noopener">
+        <img src="https://docs.spring.io/spring-boot/_/img/spring-logo.svg" 
+             alt="Spring Logo" style="max-height:40px;" />
+      </a>
+    
+  
+         <!-- Spring logo, linking to https://spring.io -->
+    <a href="https://spring.io" target="_blank" rel="noopener">
+        <img src="https://docs.spring.io/spring-boot/_/img/spring-logo.svg"
+             alt="Spring Logo" width="120"/>
+      </a>
+      &nbsp;&nbsp;
+      <a href="https://www.mongodb.com" target="_blank" rel="noopener">
+        <img src="https://www.mongodb.com/assets/images/global/MongoDB_Logo_Dark.svg"
+             alt="MongoDB Logo"  />
+      </a>
+      <a href="https://github.com/your-org/spring-kitchensink" 
+      target="_blank" rel="noopener">
+     <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png"
+          alt="GitHub Logo" style="max-height:40px;" />
+   </a>
+    </div>
+    <div class="navbar-right">
+      <!-- "Go to Classic UI" link -->
+      <a th:href="@{/members-ui}">
+        <button type="button">Go Back to Classic UI</button>
+      </a>
+    </div>
+  </div>
+
+  <header>
+    <h1>New UI - Kitchensink</h1>
+    <p>A modern look for the members application</p>
+  </header>
+
+  <main>
+    <h2>All Members</h2>
+    <div class="members-container">
+      <!-- Card for each member in the "members" model attribute -->
+      <div class="member-card" th:each="m : ${members}">
+        <h3 th:text="${m.name}">[Member Name]</h3>
+        <p><strong>Email:</strong> <span th:text="${m.email}">[Email]</span></p>
+        <p><strong>Phone:</strong> <span th:text="${m.phoneNumber}">[Phone]</span></p>
+        <a class="rest-link"
+           th:href="@{/api/members/{id}(id=${m.id})}"
+           th:text="'REST /api/members/' + ${m.id}">/api/members/XYZ</a>
+      </div>
+    </div>
+
+    <!-- "Add Member" form that posts to /new-ui/add-member,
+         so we stay in the new UI after a successful save -->
+    <div class="add-form">
+      <h2>Add a New Member</h2>
+      <form action="/new-ui/add-member" method="POST">
+        <label>Name:</label>
+        <input type="text" name="name" required />
+
+        <label>Email:</label>
+        <input type="email" name="email" required />
+
+        <label>Phone Number:</label>
+        <input type="text" name="phoneNumber" required />
+
+        <button type="submit">Register</button>
+      </form>
+    </div>
+
+    <!-- Documentation section with collapsible <details> -->
+    <div class="docs-section">
+      <details>
+        <summary>Project Documentation</summary>
+
+        <h3>How to Run the App Locally</h3>
+        <p>
+          From the root folder, type: <br/>
+          <code>mvn spring-boot:run</code> <br/>
+          Or build the jar, then: <br/>
+          <code>mvn package && java -jar target/spring-kitchensink-1.0.0-SNAPSHOT.jar</code>
+        </p>
+
+        <h3>How to Run Tests</h3>
+        <p>
+          Use: <br/>
+          <code>mvn test</code><br/>
+          or <code>mvn verify</code><br/>
+          This runs our JUnit test classes in <code>src/test/java</code>.
+        </p>
+
+        <h3>cURL POST Requests</h3>
+        <p>Example to create a new member:</p>
+        <pre><code>curl -X POST -H "Content-Type: application/json" \
+-d '{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "phoneNumber": "1234567890"
+}' \
+http://localhost:8080/api/members
+</code></pre>
+
+        <h3>How to Run with Docker</h3>
+        <p>First, build the JAR:</p>
+        <pre><code>mvn clean package</code></pre>
+        <p>Then build the Docker image:</p>
+        <pre><code>docker build -t spring-kitchensink:latest .</code></pre>
+        <p>Finally, run the container:</p>
+        <pre><code>docker run -p 8080:8080 spring-kitchensink:latest</code></pre>
+        <p>
+          Now visit <code>http://localhost:8080</code> to see the app in your browser.
+        </p>
+
+        <h3>Application Architecture</h3>
+        <p>
+          This project uses:
+        </p>
+        <ul>
+          <li>Spring Boot (REST, Thymeleaf, Validation)</li>
+          <li>MongoDB (Spring Data) for persistence</li>
+          <li>Controllers: <code>MemberController</code>, <code>MemberPageController</code> (classic UI), <code>NewUiController</code> (this UI)</li>
+          <li>Services & Repositories for domain logic and data access</li>
+        </ul>
+      </details>
+    </div>
+  </main>
+
+  <footer>
+    <p>
+      &copy; 2025 Awsome Company. 
+      <br/>
+      <a href="https://github.com/your-org/spring-kitchensink" target="_blank" rel="noopener">
+        View on GitHub
+      </a>
+    </p>
+  </footer>
+
+</body>
+</html>
 
 ================
 File: kitchensink/.gitattributes
@@ -573,6 +1070,56 @@ build/
 
 ### VS Code ###
 .vscode/
+
+================
+File: kitchensink/Dockerfile
+================
+# Use Eclipse Temurin’s Java 21 JDK on Alpine Linux
+FROM eclipse-temurin:21-jdk-alpine
+
+# Create a directory for the app
+WORKDIR /app
+
+# Copy the built JAR file into the container
+# Update the JAR name if yours differs
+COPY target/spring-kitchensink-1.0.0-SNAPSHOT.jar /app/app.jar
+
+# Expose the default Spring Boot port
+EXPOSE 8080
+
+# Define the startup command
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+
+================
+File: kitchensink/MemberIntegrationTest.java
+================
+package com.example.kitchensink;
+
+import com.example.kitchensink.model.Member;
+import com.example.kitchensink.repository.MemberRepository;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+/**
+ * Basic test verifying that the application can store a Member in MongoDB.
+ */
+@SpringBootTest
+class MemberIntegrationTest {
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    @Test
+    void testRegisterMember() {
+        Member m = new Member("Jane Doe", "jane@mail.com", "1234567890");
+        Member saved = memberRepository.save(m);
+
+        Assertions.assertNotNull(saved.getId(), "Saved member ID should not be null");
+        Assertions.assertEquals("jane@mail.com", saved.getEmail());
+    }
+}
 
 ================
 File: kitchensink/mvnw
@@ -993,26 +1540,20 @@ Write-Output "MVN_CMD=$MAVEN_HOME/bin/$MVN_CMD"
 ================
 File: kitchensink/pom.xml
 ================
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
-  
-  <groupId>com.example</groupId>
-  <artifactId>spring-kitchensink</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
-  <name>spring-kitchensink</name>
-  <description>Migrated kitchensink from JBoss EAP to Spring Boot + MongoDB</description>
-  <packaging>jar</packaging>
 
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.1.3</version> <!-- or the latest Spring Boot 3.x version -->
-    <relativePath/> <!-- Always specify -->
+    <version>3.1.3</version>
+    <relativePath/>
   </parent>
+
+  <groupId>com.example</groupId>
+  <artifactId>spring-kitchensink</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>spring-kitchensink</name>
 
   <properties>
     <java.version>21</java.version>
@@ -1020,57 +1561,46 @@ File: kitchensink/pom.xml
 
   <dependencies>
 
-    <!-- Spring Web for REST endpoints -->
+  <dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-devtools</artifactId>
+  <scope>runtime</scope>
+</dependency>
+
+    <!-- Web (REST) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
-    <!-- Spring Data MongoDB -->
+    <!-- MongoDB -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-mongodb</artifactId>
     </dependency>
 
-    <!-- Bean Validation (Hibernate Validator) -->
+    <!-- Validation -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
 
-    <!-- Thymeleaf, for a simple server-side UI (MemberPageController + members-list.html) -->
+    <!-- Thymeleaf -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-thymeleaf</artifactId>
     </dependency>
 
-    <!-- Testing -->
+    <!-- Tests -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-mongodb</artifactId>
-</dependency>
-
-
-    <!-- (Optional) Lombok for reducing boilerplate in models, etc.
-         Be sure to enable annotation processing in your IDE if you add this. -->
-    <!--
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    -->
   </dependencies>
 
   <build>
     <plugins>
-
-      <!-- Spring Boot Maven Plugin to package the app as an executable jar -->
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
@@ -1083,10 +1613,168 @@ File: kitchensink/pom.xml
           </execution>
         </executions>
       </plugin>
-      
     </plugins>
   </build>
 </project>
+
+================
+File: kitchensink/Readme.md
+================
+kitchensink - Modernization from JBoss to Spring Boot (Java 21)
+Author: Your Name / GitHub handle
+Date: Month Year
+Target: Java 21, Spring Boot, optional MongoDB backend
+Source: Originally from Red Hat’s JBoss EAP Quickstarts (the kitchensink example)
+
+1. Background & Purpose
+This repository is my modernization of the JBoss EAP kitchensink quickstart application into a Spring Boot (Java 21) application. It was created as part of a Modernization Factory: Developer Candidate Challenge. The goal was to show how a legacy JBoss Java app can be migrated to a more modern platform and approach.
+
+Original Legacy:
+
+The JBoss EAP kitchensink quickstart (GitHub link) used Jakarta EE features (CDI, EJB, JAX-RS, JSF, etc.).
+Deployed on a JBoss EAP application server.
+New Modern:
+
+Spring Boot (latest stable) + Java 21.
+Optional database switch to MongoDB (instead of the old relational/H2 approach).
+A containerizable approach with Docker for easy deployment.
+A new “modern” UI, plus the original “classic” UI.
+During an assessment interview or “playback” session, I’ll:
+
+Demo the running migrated app
+Show code changes
+Discuss lessons learned
+2. Migration Approach
+Extract the JBoss kitchensink Code
+
+We took only the relevant kitchensink subfolder, ignoring other quickstarts.
+Used an approach simulating “Repomix” tool output and ChatGPT assistance to break down which classes needed rewriting.
+Replace Jakarta EE with Spring Boot
+
+CDI -> Spring @Service / @Autowired
+JAX-RS -> Spring @RestController
+JSF -> Thymeleaf
+kitchensink-quickstart-ds.xml or persistence.xml -> Spring Boot config
+EJB -> Spring Beans (with optional @Transactional)
+Switch from H2 / RDBMS to MongoDB (optional stretch goal)
+
+Replaced JPA Entities with Spring Data Mongo Entities
+For demonstration, references a local or remote Mongo instance.
+Rewrite the UI
+
+Original “classic” UI retained in members-list.html (Thymeleaf version).
+A new “modern” UI in new-ui.html, showing a more “card-based” layout, improved styling.
+Ensure Java 21
+
+Adjusted pom.xml to <java.version>21</java.version>
+Dockerfile uses eclipse-temurin:21-jdk-alpine
+Verify
+
+JUnit tests for integration (similar to the old Arquillian tests, but now with @SpringBootTest).
+Manual checks for the new UI.
+3. Architecture Overview
+Here’s a simplified comparison of old vs. new:
+
+JBoss EAP	Spring Boot
+Deploy as WAR/EAR	Single JAR (embedded Tomcat)
+JAX-RS @Path("/members")	REST via @RestController("/api/members")
+JSF pages (*.xhtml)	Thymeleaf templates (*.html)
+EJB, CDI, JPA	@Service, @Autowired, Spring Data (Mongo)
+H2/relational DB	Optional: Switch to MongoDB
+persistence.xml	application.properties or YAML config
+Main modules:
+
+SpringKitchensinkApplication.java: Bootstraps the app (@SpringBootApplication).
+MemberController (REST) / MemberPageController + newUiController (UI).
+MemberService: Replaces EJB for business logic.
+MemberRepository: Replaces JPA DAOs with Mongo (or, if needed, JDBC or JPA).
+templates/members-list.html: Original “classic” UI.
+templates/new-ui.html: Modern card-based UI.
+4. How to Build & Run (Manually)
+Check Java version: Must be JDK 21 installed locally.
+Clone this repo:
+bash
+Copy
+Edit
+git clone https://github.com/<your-username>/spring-kitchensink.git
+cd spring-kitchensink
+Build:
+bash
+Copy
+Edit
+mvn clean package
+This produces target/spring-kitchensink-1.0.0-SNAPSHOT.jar.
+Run:
+bash
+Copy
+Edit
+java -jar target/spring-kitchensink-1.0.0-SNAPSHOT.jar
+Visit:
+Classic UI: http://localhost:8080/members-ui
+New UI: http://localhost:8080/new-ui
+REST endpoints: http://localhost:8080/api/members
+MongoDB: If you’re using the optional Mongo integration, ensure Mongo is running at mongodb://localhost:27017/ (or adjust application.properties).
+
+5. How to Run Tests
+bash
+Copy
+Edit
+mvn test
+or
+
+bash
+Copy
+Edit
+mvn verify
+This runs JUnit-based integration tests in src/test/java/....
+
+6. How to Run with Docker
+We included a Dockerfile referencing Java 21:
+
+dockerfile
+Copy
+Edit
+FROM eclipse-temurin:21-jdk-alpine
+WORKDIR /app
+COPY target/spring-kitchensink-1.0.0-SNAPSHOT.jar /app/app.jar
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/app/app.jar"]
+Steps
+Build the JAR:
+bash
+Copy
+Edit
+mvn clean package
+Build the Docker image:
+bash
+Copy
+Edit
+docker build -t spring-kitchensink:latest .
+Run:
+bash
+Copy
+Edit
+docker run -p 8080:8080 spring-kitchensink:latest
+Access:
+Classic UI: http://localhost:8080/members-ui
+New UI: http://localhost:8080/new-ui
+7. Extra Info / Observations
+We used Thymeleaf + minimal CSS to replicate the original JBoss EAP UI layout and add a new modern layout.
+We replaced JAX-RS with standard Spring REST controllers.
+If this were a large-scale legacy project, we’d do this migration step by step:
+Identify EJB vs. JAX-RS classes, rewrite each to Spring or keep them temporarily in transitional form.
+Replace JSF front-ends with Thymeleaf or a modern front-end. Possibly do it piece by piece.
+For the data layer, decide if we keep JPA or move to a new DB. Use bridging or parallel data strategies if needed.
+For the optional cloud deployment, we can produce a container image, push to a registry, and deploy to e.g. Google Cloud Run.
+This entire approach demonstrates how you can break down large migrations: rewrite, test, containerize, push to environment.
+8. Next Steps (Interview Playback)
+During the interview, I’ll:
+
+Demo the app (both UIs, the REST endpoints).
+Show key code changes from EJB/CDI/JSF -> Spring Boot/Thymeleaf.
+Highlight any challenges or solutions for data migration to Mongo.
+Answer questions about the approach and any best practices learned.
+Thank you for reviewing my modernization approach from JBoss EAP’s kitchensink to Spring Boot (Java 21).
 
 
 
