@@ -1,4 +1,3 @@
-```markdown
 # Kitchensink - Modernization from JBoss to Spring Boot (Java 21)
 
 **Target:** Java 21, Spring Boot, with MongoDB backend
