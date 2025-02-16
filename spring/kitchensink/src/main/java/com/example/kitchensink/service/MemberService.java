@@ -24,6 +24,7 @@ public class MemberService {
         if (emailAlreadyExists(member.getEmail())) {
             throw new IllegalArgumentException("A member with this email already exists.");
         }
+        // Additional validation for phone number can be added here if needed
         return memberRepository.save(member);
     }
 
