@@ -21,9 +21,8 @@ public class MemberService {
     private Validator validator; // If you need direct programmatic validation
 
     public Member register(@Valid Member member) {
-        // e.g. uniqueness check
         if (emailAlreadyExists(member.getEmail())) {
-            throw new RuntimeException("Email taken");
+            throw new IllegalArgumentException("A member with this email already exists.");
         }
         return memberRepository.save(member);
     }
