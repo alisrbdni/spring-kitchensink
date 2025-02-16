@@ -1,7 +1,6 @@
-# Kitchensink - Modernization from JBoss to Spring Boot (Java 21) 🚀
+# Kitchensink - Modernization from JBoss to Spring Boot (Java 21) + MongoDB 🚀
 
-👨‍💻 **Author:** Your Name / GitHub handle
-📅 **Date:** Month Year
+
 🎯 **Target:** Java 21, Spring Boot, MongoDB
 💾 **Source:** Originally from Red Hat’s JBoss EAP Quickstarts (kitchensink example), modernized to Spring Boot (Java 21) with MongoDB as the new database. The application now utilizes MongoDB Atlas with pre-populated data via a seeder script.
 
