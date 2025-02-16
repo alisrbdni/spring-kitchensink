@@ -5,7 +5,7 @@ This project is a Spring Boot + MongoDB application that can be deployed locally
 ## Application URL
 
 The application is deployed on GCP Cloud Run and is available at:
-- [Classic UI](https://kitchensink-93677313045.us-central1.run.app/members-ui)
+- [https://kitchensink-93677313045.us-central1.run.app/members-ui](https://kitchensink-93677313045.us-central1.run.app/members-ui)
 
 ## Test Files
 
