@@ -1,7 +1,9 @@
 # Kitchensink - Modernization from JBoss to Spring Boot (Java 21)
 
 **Target:** Java 21, Spring Boot, with MongoDB backend
+
 **Source:** Originally from Red Hat’s JBoss EAP Quickstarts (the kitchensink example) To Spring Boot (Java 21) migration with MongoDB as new database.  The application now utilizes **MongoDB Atlas** for the database, pre-populated with data via a seeder script.
+
 
 **This application is deployed with Docker on GCP Cloud Run and is accessible at: [https://kitchensink-93677313045.us-central1.run.app/members-ui](https://kitchensink-93677313045.us-central1.run.app/members-ui). It includes the classic UI and a new modern UI option.**
 
@@ -11,7 +13,7 @@ This repository showcases the modernization of the JBoss EAP kitchensink quickst
 
 **Original Legacy:**
 
-*   The JBoss EAP kitchensink quickstart ([GitHub link](https://github.com/jbossas/jboss-eap-quickstarts)) used Jakarta EE features (CDI, EJB, JAX-RS, JSF, etc.).
+*   The JBoss EAP kitchensink quickstart ([GitHub link](https://github.com/jboss-developer/jboss-eap-quickstarts/tree/8.0.x/kitchensink)) used Jakarta EE features (CDI, EJB, JAX-RS, JSF, etc.).
 *   Deployed on a JBoss EAP application server.
 
 **New Modern:**
@@ -131,11 +133,36 @@ This runs JUnit-based integration tests in `src/test/java/...`.
 We included a `Dockerfile` referencing Java 21:
 
 ```dockerfile
-FROM eclipse-temurin:21-jdk-alpine
+###########################################################
+# 1) BUILD STAGE
+#    - Uses Maven + Java 21 to compile the JAR
+###########################################################
+FROM maven:3.9.4-eclipse-temurin-21 AS builder
 WORKDIR /app
-COPY target/spring-kitchensink-1.0.0-SNAPSHOT.jar /app/app.jar
+# Copy only the pom.xml first to cache dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline
+# Copy the rest of your source code
+COPY src/ ./src
+# Compile the JAR (remove -DskipTests if you want tests)
+RUN mvn clean package -DskipTests
+###########################################################
+# 2) RUNTIME STAGE
+#    - Copies JAR into a smaller Java 21 runtime
+#    - Exposes port 8080
+#    - Sets the container CMD to run the JAR
+###########################################################
+FROM eclipse-temurin:21-jre-alpine
+WORKDIR /app
+# Copy the final JAR from the builder
+COPY --from=builder /app/target/spring-kitchensink-1.0.0-SNAPSHOT.jar /app/app.jar
+# Expose port 8080 for Cloud Run
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","/app/app.jar"]
+# Optionally install curl if you want to test *inside* the container
+# RUN apk add --no-cache curl
+# The main command to run when the container starts
+# (Points to the JAR on port 8080)
+CMD ["java", "-jar", "/app/app.jar"]
 ```
 
 **Steps:**
