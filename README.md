@@ -1,144 +1,128 @@
-# Spring Kitchensink
+# Kitchensink - Modernization from JBoss to Spring Boot (Java 21) 🚀
 
-This project is a Spring Boot + MongoDB application that can be deployed locally using Docker or on Google Cloud Platform (GCP) using Terraform & Cloud Run.
+👨‍💻 **Author:** Your Name / GitHub handle
+📅 **Date:** Month Year
+🎯 **Target:** Java 21, Spring Boot, MongoDB
+💾 **Source:** Originally from Red Hat’s JBoss EAP Quickstarts (kitchensink example), modernized to Spring Boot (Java 21) with MongoDB as the new database. The application now utilizes MongoDB Atlas with pre-populated data via a seeder script.
 
-## Application URL
+🌍 **Deployed with Docker on GCP Cloud Run:**
+🔗 [https://kitchensink-93677313045.us-central1.run.app/members-ui](https://kitchensink-93677313045.us-central1.run.app/members-ui)
+🎨 Includes both the classic UI and a new modern UI.
 
-The application is deployed on GCP Cloud Run and is available at:
-- [https://kitchensink-93677313045.us-central1.run.app/members-ui](https://kitchensink-93677313045.us-central1.run.app/members-ui)
+## 1️⃣ Background & Purpose
 
-## Test Files
+This repository demonstrates the modernization of the JBoss EAP kitchensink quickstart application into a Spring Boot (Java 21) application. It was developed as part of a Modernization Factory: Developer Candidate Challenge, showcasing how a legacy JBoss Java application can be transitioned to a modern architecture.
 
-The project includes unit tests to ensure the functionality of the application. Below is a list of key test files:
+### 🏛 Original Legacy Application:
 
-- `spring/kitchensink/src/test/java/com/example/kitchensink/service/MemberServiceTest.java`: Contains unit tests for the `MemberService` class, testing member registration, email uniqueness, and retrieval operations.
-- `spring/kitchensink/src/test/java/com/example/kitchensink/repository/MemberRepositoryTest.java`: Contains unit tests for the `MemberRepository` class, testing CRUD operations.
+*   Based on the JBoss EAP kitchensink quickstart ([GitHub link](https://github.com/jboss-developer/jboss-eap-quickstarts/tree/8.0.x/kitchensink))
+*   Utilized Jakarta EE (CDI, EJB, JAX-RS, JSF, etc.)
+*   Deployed on a JBoss EAP application server
 
-## Running Locally with Docker
+### 🚀 Modernized Application:
 
-### Prerequisites
+*   Built with Spring Boot (Java 21)
+*   Uses MongoDB Atlas instead of an H2 relational database
+*   🐳 Containerized with Docker for easy deployment
+*   🎨 Features two UI options: Classic (legacy-like) and a new modern UI
 
-Ensure you have the following installed:
-- Docker
-- Maven
-- Java 21 JDK
+### 🔄 Migration Steps Overview:
 
-### Steps to Run Locally
+*   🗺 **Code Mapping:** Used repomix to analyze the original structure.
+*   🌱 **Spring Boot Initialization:** Created a new Spring Boot base application.
+*   🔧 **Service & Function Conversion:** Migrated Jakarta EE components to Spring Boot equivalents.
+*   💾 **Database Migration:** Replaced H2 with MongoDB Atlas, including a data seeder script.
+*   ✅ **Automated Testing:** Expanded JUnit test coverage.
+*   📦 **Deployment:** Containerized the app with Docker and deployed on GCP Cloud Run.
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
-   cd kitchensink
-   ```
+### 🎤 Interview Playback:
 
-2. **Build the JAR file**:
-   ```bash
-   mvn clean package
-   ```
+During an assessment, I will:
 
-3. **Build the Docker image**:
-   ```bash
-   docker build -t kitchensink:latest .
-   ```
+*   🎬 Demo the running application
+*   📜 Explain key code changes
+*   💡 Discuss lessons learned
 
-4. **Run the Docker container**:
-   ```bash
-   docker run -p 8080:8080 kitchensink:latest
-   ```
+## 2️⃣ Migration Approach
 
-5. **Access the application**:
-   - Classic UI: [http://localhost:8080/members-ui](http://localhost:8080/members-ui)
-   - New UI: [http://localhost:8080/new-ui](http://localhost:8080/new-ui)
-   - Test API Endpoint: [http://localhost:8080/api/members](http://localhost:8080/api/members)
+### 🔁 Key Changes from Jakarta EE to Spring Boot:
 
-## Deploying to GCP using Terraform
+*   🔹 CDI → `@Service`, `@Autowired`
+*   🔹 JAX-RS → `@RestController`
+*   🔹 JSF → Thymeleaf templates
+*   🔹 EJB → Spring Beans (`@Transactional` where necessary)
+*   🔹 Persistence Configuration: JPA (H2) replaced with MongoDB Atlas and Spring Data Mongo
 
-### Prerequisites
+### 📂 Database Migration to MongoDB Atlas:
 
-Ensure you have the following installed:
-- Google Cloud SDK (gcloud CLI)
-- Terraform
+*   🔄 Converted JPA Entities to Spring Data MongoDB Entities
+*   ⚙️ Updated `application.properties` for MongoDB Atlas connection
+*   📜 Implemented a seeder script for initial data population
 
-### Enable Required GCP Services
+### 🎨 UI Modernization:
 
-Run the following commands to enable required APIs:
-```bash
-gcloud services enable \
-    compute.googleapis.com \
-    run.googleapis.com \
-    cloudbuild.googleapis.com \
-    artifactregistry.googleapis.com
-```
+*   🏛 Classic UI (`members-list.html`) preserves legacy layout
+*   ✨ Modern UI (`new-ui.html`) features an improved, card-based design
 
-### Steps to Deploy
+## 3️⃣ Architecture Overview
 
-1. **Authenticate & Set Project**:
-   ```bash
-   gcloud auth application-default login
-   gcloud config set project YOUR_GCP_PROJECT_ID
-   ```
+🏛 **Legacy (JBoss EAP)** | 🚀 **Modern (Spring Boot)**
+----------------------- | -----------------------
+📦 Deploy as WAR/EAR | 📦 Single JAR (embedded Tomcat)
+🌐 JAX-RS `@Path("/members")` | 🔗 REST via `@RestController("/api/members")`
+🎭 JSF (`*.xhtml`) | 🎨 Thymeleaf (`*.html`)
+⚙️ EJB, CDI, JPA | ⚙️ `@Service`, `@Autowired`, Spring Data (MongoDB)
+🗄 H2/Relational DB | 🗄 MongoDB Atlas
+⚙️ `persistence.xml` | ⚙️ `application.properties` (YAML supported)
 
-2. **Navigate to Terraform directory**:
-   ```bash
-   cd kitchensink/terraform
-   ```
+### 📌 Main Components:
 
-3. **Initialize Terraform**:
-   ```bash
-   terraform init
-   ```
+*   🚀 `SpringKitchensinkApplication.java`: Bootstraps the Spring Boot app
+*   🔗 `MemberController`: REST API for members
+*   🛠 `MemberService`: Handles business logic (EJB replacement)
+*   💾 `MemberRepository`: Uses Spring Data MongoDB
+*   🎭 `templates/members-list.html`: Classic UI
+*   🎨 `templates/new-ui.html`: Modern UI
+*   📜 `Seeder Script`: Loads initial data into MongoDB Atlas
 
-4. **Apply Terraform Configuration**:
-   ```bash
-   terraform apply -var="gcp_project_id=YOUR_PROJECT_ID" -auto-approve
-   ```
+## 4️⃣ Build & Run Locally
 
-5. **Retrieve Cloud Run URL**:
-   ```bash
-   terraform output cloud_run_url
-   ```
+### ⚙️ Prerequisites:
 
-### (Optional) Build & Push Docker Image Manually
+*   ☕ Java 21 installed
+*   📦 Maven installed
+*   ☁️ MongoDB Atlas configured
 
-If Terraform does not handle Docker builds, manually build and push the image:
-```bash
-docker build -t us-central1-docker.pkg.dev/YOUR_PROJECT_ID/kitchensink-repo/kitchensink:latest .
-docker push us-central1-docker.pkg.dev/YOUR_PROJECT_ID/kitchensink-repo/kitchensink:latest
-```
-
-## Verify Cloud Deployment
-
-### Open in Browser
+### 📥 Clone the repository:
 
 ```bash
-open $(terraform output -raw cloud_run_url)
+git clone https://github.com/<your-username>/spring-kitchensink.git
+cd spring-kitchensink
 ```
 
-### Test API with cURL
+### 🏗 Build & Run:
 
 ```bash
-curl $(terraform output -raw cloud_run_url)/api/members
+mvn clean package
+java -jar target/spring-kitchensink-1.0.0-SNAPSHOT.jar
 ```
 
-### Check the Web UI
+### 🌐 Access the Application:
 
-- Classic UI: [https://kitchensink-app-xyz123.a.run.app/members-ui](https://kitchensink-app-xyz123.a.run.app/members-ui)
-- New UI: [https://kitchensink-app-xyz123.a.run.app/new-ui](https://kitchensink-app-xyz123.a.run.app/new-ui)
+*   🏛 Classic UI: [http://localhost:8080/members-ui](http://localhost:8080/members-ui)
+*   ✨ Modern UI: [http://localhost:8080/new-ui](http://localhost:8080/new-ui)
+*   🔗 API: [http://localhost:8080/api/members](http://localhost:8080/api/members)
 
-## Cleanup (Destroy GCP Resources)
+### 🔥 Key Takeaways
 
-To delete all resources created by Terraform:
-```bash
-terraform destroy -var="gcp_project_id=YOUR_PROJECT_ID" -auto-approve
-```
+*   🚀 Spring Boot and MongoDB Atlas provide a modern, scalable alternative to JBoss EAP and relational databases.
+*   🐳 Containerization with Docker simplifies deployment and portability.
+*   ☁️ Cloud Run deployment enables easy serverless hosting.
+*   ✅ Automated testing ensures a smooth transition.
 
-## Summary
+## 🎤 Interview Playback Plan
 
-- **Local Docker Run**: ✅
-- **Terraform GCP Deploy**: ✅
-- **Spring Boot App**: Runs in Docker locally and deploys to Cloud Run
-- **Exposed on Port 8080**: ✅ localhost:8080, ✅ Public Cloud Run URL
-- **API Access**: ✅ localhost:8080/api/members, ✅ /api/members on Cloud Run
-- **Auto Build & Deploy**: ❌ Manual, ✅ Automated with Cloud Build
-
-🚀 Now, your kitchensink Spring Boot app can run locally and on GCP! 🚀
+*   🎬 Live demo of the deployed application
+*   👨‍💻 Code walkthrough showcasing migration changes
+*   💡 Discussion on challenges and solutions
+*   🔍 Best practices in modernization projects
