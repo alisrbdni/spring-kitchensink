@@ -20,16 +20,16 @@ public class MemberService {
     @Autowired
     private Validator validator; // If you need direct programmatic validation
 
-    public Member register(@Valid Member member) {
+    public Member register(Member member) {
+        // e.g. uniqueness check
         if (emailAlreadyExists(member.getEmail())) {
-            throw new IllegalArgumentException("A member with this email already exists.");
+            throw new RuntimeException("Email already exists");
         }
-        // Additional validation for phone number can be added here if needed
         return memberRepository.save(member);
     }
 
     public boolean emailAlreadyExists(String email) {
-        return (memberRepository.findByEmail(email) != null);
+        return (memberRepository.findMemberByEmail(email) != null);
     }
 
     public List<Member> findAll() {

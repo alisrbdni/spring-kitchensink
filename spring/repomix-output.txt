@@ -456,9 +456,8 @@ public class MemberService {
     private Validator validator; // If you need direct programmatic validation
 
     public Member register(@Valid Member member) {
-        // e.g. uniqueness check
         if (emailAlreadyExists(member.getEmail())) {
-            throw new RuntimeException("Email taken");
+            throw new IllegalArgumentException("A member with this email already exists.");
         }
         return memberRepository.save(member);
     }
@@ -597,6 +596,11 @@ File: kitchensink/src/main/resources/templates/members-list.html
       th, td {
         padding: 0.6em;
       }
+      /* Table header styling: black background and white text */
+      table thead th {
+        background-color: #000;
+        color: #fff;
+      }
       form {
         border: 1px solid #D5D5D5;
         padding: 1em;
@@ -612,25 +616,23 @@ File: kitchensink/src/main/resources/templates/members-list.html
     <!-- A top navbar that won't overlap the container -->
     <div class="navbar">
       <div class="navbar-left">
-        <!-- Spring logo from external link, clickable -->
-      <!-- Example HTML snippet -->
-<div style="margin-bottom: 20px;">
-    <!-- Spring logo, linking to https://spring.io -->
-    <a href="https://spring.io" target="_blank" rel="noopener">
-      <img src="https://docs.spring.io/spring-boot/_/img/spring-logo.svg"
-           alt="Spring Logo" width="120"/>
-    </a>
-    &nbsp;&nbsp;
-    <!-- MongoDB logo, linking to https://mongodb.com -->
-    <a href="https://www.mongodb.com" target="_blank" rel="noopener">
-      <img src="https://webimages.mongodb.com/_com_assets/cms/kuyjf3vea2hg34taa-horizontal_default_slate_blue.svg?auto=format%252Ccompress"
-           alt="MongoDB Logo" width="120"
-            />
-    </a>
-  </div>
+        <!-- Spring and MongoDB logos -->
+        <div style="margin-bottom: 20px;">
+          <!-- Spring logo, linking to https://spring.io -->
+          <a href="https://spring.io" target="_blank" rel="noopener">
+            <img src="https://docs.spring.io/spring-boot/_/img/spring-logo.svg"
+                 alt="Spring Logo" width="120"/>
+          </a>
+          &nbsp;&nbsp;
+          <!-- MongoDB logo, linking to https://mongodb.com -->
+          <a href="https://www.mongodb.com" target="_blank" rel="noopener">
+            <img src="https://webimages.mongodb.com/_com_assets/cms/kuyjf3vea2hg34taa-horizontal_default_slate_blue.svg?auto=format%252Ccompress"
+                 alt="MongoDB Logo" width="120"/>
+          </a>
+        </div>
   
-        <!-- GitHub logo from external link, clickable -->
-        <a href="https://github.com/your-org/spring-kitchensink" target="_blank" rel="noopener">
+        <!-- GitHub logo linking to the updated repository -->
+        <a href="https://github.com/alisrbdni/spring-kitchensink" target="_blank" rel="noopener">
           <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png"
                alt="GitHub Logo" 
                style="max-height:40px;" />
@@ -648,7 +650,7 @@ File: kitchensink/src/main/resources/templates/members-list.html
     <div id="container">
       <div id="content">
           <h1>Welcome to Spring Kitchensink!</h1>
-<div style="margin-top: 20%;"></div>
+          <div style="margin-top: 20%;"></div>
           <h2>Members</h2>
           <table>
               <thead>
@@ -719,7 +721,7 @@ File: kitchensink/src/main/resources/templates/members-list.html
                 </a>
               </li>
               <li>
-                <a href="https://github.com/your-org/spring-kitchensink" 
+                <a href="https://github.com/alisrbdni/spring-kitchensink" 
                    target="_blank" rel="noopener">
                   Project GitHub
                 </a>
@@ -931,7 +933,7 @@ File: kitchensink/src/main/resources/templates/new-ui.html
         <img src="https://www.mongodb.com/assets/images/global/MongoDB_Logo_Dark.svg"
              alt="MongoDB Logo"  />
       </a>
-      <a href="https://github.com/your-org/spring-kitchensink" 
+      <a href="https://github.com/alisrbdni/spring-kitchensink" 
       target="_blank" rel="noopener">
      <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png"
           alt="GitHub Logo" style="max-height:40px;" />
@@ -1043,7 +1045,7 @@ http://localhost:8080/api/members
     <p>
       &copy; 2025 Awsome Company. 
       <br/>
-      <a href="https://github.com/your-org/spring-kitchensink" target="_blank" rel="noopener">
+      <a href="https://github.com/alisrbdni/spring-kitchensink" target="_blank" rel="noopener">
         View on GitHub
       </a>
     </p>

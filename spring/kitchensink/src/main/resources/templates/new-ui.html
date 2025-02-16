@@ -4,267 +4,279 @@
     <title>New UI - Kitchensink</title>
     <meta charset="UTF-8" />
     <style>
-      /* Minimal "modern" layout + top navbar */
-      body {
-        margin: 0; 
-        padding: 0;
-        font-family: Arial, sans-serif;
-        background-color: #f5f7fa;
-      }
+        /* Minimal "modern" layout + top navbar */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+        }
 
-      .navbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background-color: #fafafa;
-        box-shadow: 0 1px 5px rgba(0,0,0,0.1);
-        padding: 10px 20px;
-      }
-      .navbar-left {
-        display: flex;
-        gap: 10px;
-      }
-      .navbar-left img {
-        max-height: 40px;
-      }
-      .navbar-right button {
-        background-color: #ff9800;
-        color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
-        font-size: 0.9em;
-        cursor: pointer;
-      }
-      .navbar-right button:hover {
-        background-color: #e68a00;
-      }
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #fafafa;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+            padding: 10px 20px;
+        }
+        .navbar-left {
+            display: flex;
+            gap: 10px;
+        }
+        .navbar-left img {
+            max-height: 40px;
+        }
+        .navbar-right button {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+        .navbar-right button:hover {
+            background-color: #e68a00;
+        }
 
-      header {
-        background: linear-gradient(to right, #68b4cf, #88d8b0);
-        padding: 20px;
-        text-align: center;
-        color: #fff;
-      }
-      header h1 {
-        margin: 0;
-        font-size: 2em;
-      }
-      header p {
-        margin: 4px 0;
-      }
+        header {
+            background: linear-gradient(to right, #68b4cf, #88d8b0);
+            padding: 20px;
+            text-align: center;
+            color: #fff;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+        header p {
+            margin: 4px 0;
+        }
 
-      main {
-        max-width: 900px;
-        margin: 20px auto;
-        padding: 0 10px;
-      }
+        main {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 10px;
+        }
 
-      .members-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 16px;
-      }
-      .member-card {
-        flex: 1 1 calc(33% - 16px);
-        background: #fff;
-        border-radius: 5px;
-        padding: 12px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        min-width: 220px;
-      }
-      .member-card h3 {
-        margin: 0 0 8px;
-        font-size: 1.1em;
-        color: #333;
-      }
-      .member-card p {
-        margin: 4px 0;
-        font-size: 0.9em;
-        color: #666;
-      }
-      .rest-link {
-        margin-top: 8px;
-        display: inline-block;
-        color: #0066cc;
-        font-size: 0.85em;
-        text-decoration: none;
-      }
+        .members-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .member-card {
+            flex: 1 1 calc(33% - 16px);
+            background: #fff;
+            border-radius: 5px;
+            padding: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            min-width: 220px;
+        }
+        .member-card h3 {
+            margin: 0 0 8px;
+            font-size: 1.1em;
+            color: #333;
+        }
+        .member-card p {
+            margin: 4px 0;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .rest-link {
+            margin-top: 8px;
+            display: inline-block;
+            color: #0066cc;
+            font-size: 0.85em;
+            text-decoration: none;
+        }
 
-      .add-form {
-        background: #fff;
-        border-radius: 5px;
-        padding: 16px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin-top: 20px;
-      }
-      .add-form h2 {
-        margin-top: 0;
-      }
-      .add-form label {
-        display: block;
-        margin: 6px 0 2px;
-        font-weight: bold;
-        font-size: 0.9em;
-      }
-      .add-form input {
-        width: 100%;
-        padding: 6px;
-        margin-bottom: 12px;
-        font-size: 0.9em;
-        box-sizing: border-box;
-      }
-      .add-form button {
-        background-color: #68b4cf;
-        border: none;
-        padding: 10px 16px;
-        color: #fff;
-        cursor: pointer;
-        border-radius: 4px;
-        font-size: 0.9em;
-      }
-      .add-form button:hover {
-        background-color: #579eb8;
-      }
+        .add-form {
+            background: #fff;
+            border-radius: 5px;
+            padding: 16px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .add-form h2 {
+            margin-top: 0;
+        }
+        .add-form label {
+            display: block;
+            margin: 6px 0 2px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .add-form input {
+            width: 100%;
+            padding: 6px;
+            margin-bottom: 12px;
+            font-size: 0.9em;
+            box-sizing: border-box;
+        }
+        .add-form button {
+            background-color: #68b4cf;
+            border: none;
+            padding: 10px 16px;
+            color: #fff;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .add-form button:hover {
+            background-color: #579eb8;
+        }
 
-      footer {
-        text-align: center;
-        margin: 20px 0;
-        font-size: 0.85em;
-        color: #999;
-      }
-      footer a {
-        color: #666;
-        text-decoration: none;
-      }
-      footer a:hover {
-        text-decoration: underline;
-      }
+        footer {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 0.85em;
+            color: #999;
+        }
+        footer a {
+            color: #666;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
 
-      .docs-section {
-        background: #fafafa;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        margin-top: 30px;
-        padding: 16px;
-      }
-      .docs-section details {
-        margin-bottom: 8px;
-      }
-      .docs-section summary {
-        cursor: pointer;
-        font-weight: bold;
-        font-size: 1em;
-        margin-bottom: 8px;
-      }
-      .docs-section p, .docs-section pre {
-        font-size: 0.9em;
-        line-height: 1.4;
-        margin: 6px 0;
-      }
-      .docs-section code {
-        background-color: #eee;
-        padding: 2px 4px;
-        border-radius: 3px;
-      }
+        .docs-section {
+            background: #fafafa;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-top: 30px;
+            padding: 16px;
+        }
+        .docs-section details {
+            margin-bottom: 8px;
+        }
+        .docs-section summary {
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+            margin-bottom: 8px;
+        }
+        .docs-section p, .docs-section pre {
+            font-size: 0.9em;
+            line-height: 1.4;
+            margin: 6px 0;
+        }
+        .docs-section code {
+            background-color: #eee;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .error-message {
+            color: red;
+        }
+        .validation-message {
+            color: red;
+            font-size: 0.8em;
+        }
     </style>
 </head>
 <body>
 
-  <!-- Navbar with logos (Spring, MongoDB, GitHub) on left, "Go Back" button on right -->
-  <div class="navbar">
+<!-- Navbar with logos (Spring, MongoDB, GitHub) on left, "Go Back" button on right -->
+<div class="navbar">
     <div class="navbar-left">
-      <a href="https://spring.io" target="_blank" rel="noopener">
-        <img src="https://docs.spring.io/spring-boot/_/img/spring-logo.svg" 
-             alt="Spring Logo" style="max-height:40px;" />
-      </a>
-    
-  
-         <!-- Spring logo, linking to https://spring.io -->
-    <a href="https://spring.io" target="_blank" rel="noopener">
-        <img src="https://docs.spring.io/spring-boot/_/img/spring-logo.svg"
-             alt="Spring Logo" width="120"/>
-      </a>
-      &nbsp;&nbsp;
-      <a href="https://www.mongodb.com" target="_blank" rel="noopener">
-        <img src="https://www.mongodb.com/assets/images/global/MongoDB_Logo_Dark.svg"
-             alt="MongoDB Logo"  />
-      </a>
-      <a href="https://github.com/alisrbdni/spring-kitchensink" 
-      target="_blank" rel="noopener">
-     <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png"
-          alt="GitHub Logo" style="max-height:40px;" />
-   </a>
+        <a href="https://spring.io" target="_blank" rel="noopener">
+            <img src="https://docs.spring.io/spring-boot/_/img/spring-logo.svg"
+                 alt="Spring Logo" style="max-height:40px;" />
+        </a>
+
+
+        <!-- Spring logo, linking to https://spring.io -->
+        <a href="https://spring.io" target="_blank" rel="noopener">
+            <img src="https://docs.spring.io/spring-boot/_/img/spring-logo.svg"
+                 alt="Spring Logo" width="120"/>
+        </a>
+        &nbsp;&nbsp;
+        <a href="https://www.mongodb.com" target="_blank" rel="noopener">
+            <img src="https://webimages.mongodb.com/_com_assets/cms/kuyjf3vea2hg34taa-horizontal_default_slate_blue.svg?auto=format%252Ccompress"
+                     alt="MongoDB Logo" width="120"/>
+        </a>
+        <a href="https://github.com/alisrbdni/spring-kitchensink"
+           target="_blank" rel="noopener">
+            <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png"
+                 alt="GitHub Logo" style="max-height:40px;" />
+        </a>
     </div>
     <div class="navbar-right">
-      <!-- "Go to Classic UI" link -->
-      <a th:href="@{/members-ui}">
-        <button type="button">Go Back to Classic UI</button>
-      </a>
+        <!-- "Go to Classic UI" link -->
+        <a th:href="@{/members-ui}">
+            <button type="button">Go Back to Classic UI</button>
+        </a>
     </div>
-  </div>
+</div>
 
-  <header>
+<header>
     <h1>New UI - Kitchensink</h1>
     <p>A modern look for the members application</p>
-  </header>
+</header>
 
-  <main>
+<main>
     <h2>All Members</h2>
     <div class="members-container">
-      <!-- Card for each member in the "members" model attribute -->
-      <div class="member-card" th:each="m : ${members}">
-        <h3 th:text="${m.name}">[Member Name]</h3>
-        <p><strong>Email:</strong> <span th:text="${m.email}">[Email]</span></p>
-        <p><strong>Phone:</strong> <span th:text="${m.phoneNumber}">[Phone]</span></p>
-        <a class="rest-link"
-           th:href="@{/api/members/{id}(id=${m.id})}"
-           th:text="'REST /api/members/' + ${m.id}">/api/members/XYZ</a>
-      </div>
+        <!-- Card for each member in the "members" model attribute -->
+        <div class="member-card" th:each="m : ${members}">
+            <h3 th:text="${m.name}">[Member Name]</h3>
+            <p><strong>Email:</strong> <span th:text="${m.email}">[Email]</span></p>
+            <p><strong>Phone:</strong> <span th:text="${m.phoneNumber}">[Phone]</span></p>
+            <a class="rest-link"
+               th:href="@{/api/members/{id}(id=${m.id})}"
+               th:text="'REST /api/members/' + ${m.id}">/api/members/XYZ</a>
+        </div>
     </div>
 
     <!-- "Add Member" form that posts to /new-ui/add-member,
          so we stay in the new UI after a successful save -->
     <div class="add-form">
-      <h2>Add a New Member</h2>
-      <form action="/new-ui/add-member" method="POST">
-        <label>Name:</label>
-        <input type="text" name="name" required />
+        <h2>Add a New Member</h2>
+        <form action="/new-ui/add-member" method="POST" th:object="${member}">
+            <div th:if="${errorMessage}" class="error-message" th:text="${errorMessage}"></div>
 
-        <label>Email:</label>
-        <input type="email" name="email" required />
+            <label>Name:</label>
+            <input type="text" th:field="*{name}" required />
+            <div class="validation-message" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
 
-        <label>Phone Number:</label>
-        <input type="text" name="phoneNumber" required />
+            <label>Email:</label>
+            <input type="email" th:field="*{email}" required />
+            <div class="validation-message" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
 
-        <button type="submit">Register</button>
-      </form>
+            <label>Phone Number:</label>
+            <input type="text" th:field="*{phoneNumber}" required />
+            <div class="validation-message" th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></div>
+
+            <button type="submit">Register</button>
+        </form>
     </div>
 
     <!-- Documentation section with collapsible <details> -->
     <div class="docs-section">
-      <details>
-        <summary>Project Documentation</summary>
+        <details>
+            <summary>Project Documentation</summary>
 
-        <h3>How to Run the App Locally</h3>
-        <p>
-          From the root folder, type: <br/>
-          <code>mvn spring-boot:run</code> <br/>
-          Or build the jar, then: <br/>
-          <code>mvn package && java -jar target/spring-kitchensink-1.0.0-SNAPSHOT.jar</code>
-        </p>
+            <h3>How to Run the App Locally</h3>
+            <p>
+                From the root folder, type: <br/>
+                <code>mvn spring-boot:run</code> <br/>
+                Or build the jar, then: <br/>
+                <code>mvn package && java -jar target/spring-kitchensink-1.0.0-SNAPSHOT.jar</code>
+            </p>
 
-        <h3>How to Run Tests</h3>
-        <p>
-          Use: <br/>
-          <code>mvn test</code><br/>
-          or <code>mvn verify</code><br/>
-          This runs our JUnit test classes in <code>src/test/java</code>.
-        </p>
+            <h3>How to Run Tests</h3>
+            <p>
+                Use: <br/>
+                <code>mvn test</code><br/>
+                or <code>mvn verify</code><br/>
+                This runs our JUnit test classes in <code>src/test/java</code>.
+            </p>
 
-        <h3>cURL POST Requests</h3>
-        <p>Example to create a new member:</p>
-        <pre><code>curl -X POST -H "Content-Type: application/json" \
+            <h3>cURL POST Requests</h3>
+            <p>Example to create a new member:</p>
+            <pre><code>curl -X POST -H "Content-Type: application/json" \
 -d '{
   "name": "John Doe",
   "email": "john@example.com",
@@ -273,40 +285,40 @@
 http://localhost:8080/api/members
 </code></pre>
 
-        <h3>How to Run with Docker</h3>
-        <p>First, build the JAR:</p>
-        <pre><code>mvn clean package</code></pre>
-        <p>Then build the Docker image:</p>
-        <pre><code>docker build -t spring-kitchensink:latest .</code></pre>
-        <p>Finally, run the container:</p>
-        <pre><code>docker run -p 8080:8080 spring-kitchensink:latest</code></pre>
-        <p>
-          Now visit <code>http://localhost:8080</code> to see the app in your browser.
-        </p>
+            <h3>How to Run with Docker</h3>
+            <p>First, build the JAR:</p>
+            <pre><code>mvn clean package</code></pre>
+            <p>Then build the Docker image:</p>
+            <pre><code>docker build -t spring-kitchensink:latest .</code></pre>
+            <p>Finally, run the container:</p>
+            <pre><code>docker run -p 8080:8080 spring-kitchensink:latest</code></pre>
+            <p>
+                Now visit <code>http://localhost:8080</code> to see the app in your browser.
+            </p>
 
-        <h3>Application Architecture</h3>
-        <p>
-          This project uses:
-        </p>
-        <ul>
-          <li>Spring Boot (REST, Thymeleaf, Validation)</li>
-          <li>MongoDB (Spring Data) for persistence</li>
-          <li>Controllers: <code>MemberController</code>, <code>MemberPageController</code> (classic UI), <code>NewUiController</code> (this UI)</li>
-          <li>Services & Repositories for domain logic and data access</li>
-        </ul>
-      </details>
+            <h3>Application Architecture</h3>
+            <p>
+                This project uses:
+            </p>
+            <ul>
+                <li>Spring Boot (REST, Thymeleaf, Validation)</li>
+                <li>MongoDB (Spring Data) for persistence</li>
+                <li>Controllers: <code>MemberController</code>, <code>MemberPageController</code> (classic UI), <code>NewUiController</code> (this UI)</li>
+                <li>Services & Repositories for domain logic and data access</li>
+            </ul>
+        </details>
     </div>
-  </main>
+</main>
 
-  <footer>
+<footer>
     <p>
-      &copy; 2025 Awsome Company. 
-      <br/>
-      <a href="https://github.com/alisrbdni/spring-kitchensink" target="_blank" rel="noopener">
-        View on GitHub
-      </a>
+        &copy; 2025 Awsome Company.
+        <br/>
+        <a href="https://github.com/alisrbdni/spring-kitchensink" target="_blank" rel="noopener">
+            View on GitHub
+        </a>
     </p>
-  </footer>
+</footer>
 
 </body>
 </html>
