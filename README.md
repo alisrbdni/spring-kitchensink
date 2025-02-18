@@ -120,7 +120,7 @@ java -jar target/spring-kitchensink-1.0.0-SNAPSHOT.jar
 *   ☁️ Cloud Run deployment enables easy serverless hosting.
 *   ✅ Automated testing ensures a smooth transition.
 
-## 🎤 Interview Playback Plan
+## 📅 Playback Plan
 
 *   🎬 Live demo of the deployed application
 *   👨‍💻 Code walkthrough showcasing migration changes
