@@ -103,8 +103,9 @@ cd spring-kitchensink
 ### 🏗 Build & Run:
 
 ```bash
-mvn clean package
-java -jar target/spring-kitchensink-1.0.0-SNAPSHOT.jar
+cd spring/kitchensink
+mvn clean install
+mvn spring-boot:run
 ```
 
 ### 🌐 Access the Application:
