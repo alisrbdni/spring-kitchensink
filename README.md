@@ -28,6 +28,8 @@ This repository demonstrates the modernization of the JBoss EAP kitchensink quic
 
 ### 🔄 Migration Steps Overview:
 
+([Migration Plan Documentation](https://whimsical.com/jboss-to-spring-boot-migration-plan-C3MPNSsr2k8GNGjbEztaCK))
+
 *   🗺 **Code Mapping:** Used repomix to analyze the original structure.
 *   🌱 **Spring Boot Initialization:** Created a new Spring Boot base application.
 *   🔧 **Service & Function Conversion:** Migrated Jakarta EE components to Spring Boot equivalents.
