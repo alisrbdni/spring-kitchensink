@@ -116,6 +116,18 @@ mvn spring-boot:run
 *   ✨ Modern UI: [http://localhost:8080/new-ui](http://localhost:8080/new-ui)
 *   🔗 API: [http://localhost:8080/api/members](http://localhost:8080/api/members)
 
+### ☁️ Create members via REST API:
+
+```bash
+curl -X POST -H "Content-Type: application/json" \
+-d '{
+  "name": "John Doe",
+  "email": "john@doe.com",
+  "phoneNumber": "1234567890"
+}' \
+https://kitchensink-93677313045.us-central1.run.app/api/members
+```
+
 ### 🔥 Key Takeaways
 
 *   🚀 Spring Boot and MongoDB Atlas provide a modern, scalable alternative to JBoss EAP and relational databases.
